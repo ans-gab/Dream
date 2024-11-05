@@ -1,0 +1,17 @@
+.circle {
+  display: inline-block;
+  width: 30px; /* 调整直径 */
+  height: 30px; /* 调整直径 */
+  border-radius: 50%; /* 使其为圆形 */
+
+  color: white; /* 文字颜色为白色 */
+  text-align: center; /* 文字居中 */
+  line-height: 30px; /* 垂直居中 */
+  margin-right: 5px; /* 右边距 */
+}
+.red-ball{
+  background-color: red; /* 背景色为红色 */
+}
+.blue-ball{
+  background-color: blue; /* 背景色为蓝色 */
+}

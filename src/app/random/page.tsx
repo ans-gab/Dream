@@ -9,8 +9,8 @@ import "./index.css";
 
 // 定义参数接口
 interface Params {
-  redOddEven: string | number;
-  redBigSmall: string | number;
+  redOddEven: number;
+  redBigSmall: number;
   redSumMin: number;
   redSumMax: number;
   isConsecutive: number;
@@ -19,8 +19,8 @@ interface Params {
   redKill1: number;
   redKill2: number;
   bluePosition: number;
-  blueOddEven: string | number;
-  blueBigSmall: string | number;
+  blueOddEven: number;
+  blueBigSmall: number;
 }
 
 const SsqNumberGenerator = () => {
@@ -28,18 +28,18 @@ const SsqNumberGenerator = () => {
   const [showMachine, setShowMachine] = useState(false); // 控制是否展示机选条件
   const [params, setParams] = useState({
     // 参数状态
-    redOddEven: "all",
-    redBigSmall: "all",
+    redOddEven: -1,
+    redBigSmall: -1,
     redSumMin: 21,
     redSumMax: 183,
-    isConsecutive: 0,
+    isConsecutive: -1,
     redDefinite1: null,
     redDefinite2: null,
     redKill1: "",
     redKill2: "",
     bluePosition: "",
-    blueOddEven: "all",
-    blueBigSmall: "all",
+    blueOddEven: -1,
+    blueBigSmall: -1,
   });
 
   // 定义红球和蓝球的数字数组
@@ -58,16 +58,16 @@ const SsqNumberGenerator = () => {
       let validBlueNumbers = blueNumbers; // 初始有效号码列表
 
       // 根据奇偶参数过滤
-      if (params.blueOddEven === "0") {
+      if (params.blueOddEven === 0) {
         validBlueNumbers = oddBlueNumbers;
-      } else if (params.blueOddEven === "1") {
+      } else if (params.blueOddEven === 1) {
         validBlueNumbers = evenBlueNumbers;
       }
 
       // 根据大小参数进一步过滤
-      if (params.blueBigSmall === "0") {
+      if (params.blueBigSmall === 1) {
         validBlueNumbers = validBlueNumbers.filter((num) => num > 8); // 大数蓝球
-      } else if (params.blueBigSmall === "1") {
+      } else if (params.blueBigSmall === 1) {
         validBlueNumbers = validBlueNumbers.filter((num) => num <= 8); // 小数蓝球
       }
 
@@ -82,8 +82,8 @@ const SsqNumberGenerator = () => {
 
   // 红球生成函数
   function generateRedBalls(
-    oddEvenRatio: string | number,
-    sizeRatio: string | number,
+    oddEvenRatio: number,
+    sizeRatio: number,
     sumMin: number,
     sumMax: number,
     isConsecutive: number,
@@ -108,8 +108,8 @@ const SsqNumberGenerator = () => {
 
     const generateValidNumbers = () => {
       let numbers: number[] = [];
-      const targetOddCount = oddEvenRatio !== "all" ? Number(oddEvenRatio) : -1;
-      const targetSmallCount = sizeRatio !== "all" ? Number(sizeRatio) : -1;
+      const targetOddCount = oddEvenRatio;
+      const targetSmallCount = sizeRatio;
 
       // 处理只有一个比例为 -1 的情况
       if (targetOddCount === -1 && targetSmallCount === -1) {
@@ -164,8 +164,8 @@ const SsqNumberGenerator = () => {
 
       // 检查连号要求
       const hasConsecutive = checkConsecutive(numbers);
-      if (isConsecutive === 1 && !hasConsecutive) return null;
-      if (isConsecutive === 2 && hasConsecutive) return null;
+      if (isConsecutive === 0 && !hasConsecutive) return null;
+      if (isConsecutive === 1 && hasConsecutive) return null;
 
       return numbers;
     };

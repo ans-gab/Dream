@@ -60,7 +60,7 @@ const FilterForm = ({ params, setParams }) => {
             max={redSumMax}
             defaultValue={redSumMin}
             changeOnWheel
-            style={{ width: 40 }}
+            style={{ width: 50 }}
             onChange={(e) => setParams({ ...params, redSumMin: e })}
           />
           到
@@ -70,7 +70,7 @@ const FilterForm = ({ params, setParams }) => {
             max={redSumMax}
             defaultValue={redSumMax}
             changeOnWheel
-            style={{ width: 40 }}
+            style={{ width: 50 }}
             onChange={(e) => setParams({ ...params, redSumMax: e })}
           />
         </Form.Item>

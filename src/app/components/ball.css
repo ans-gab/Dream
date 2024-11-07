@@ -21,3 +21,7 @@
 .ant-input-number-handler-wrap {
   display: none !important;
 }
+
+.choose {
+  background: #8d8d8d;
+}

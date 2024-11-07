@@ -101,15 +101,45 @@ const SsqNumberGenerator = () => {
     const smallEvenNumbers = Array.from({ length: 8 }, (_, i) => (i + 1) * 2);
     const bigOddNumbers = Array.from({ length: 8 }, (_, i) => i * 2 + 17);
     const bigEvenNumbers = Array.from({ length: 9 }, (_, i) => (i + 9) * 2);
+    const oddNumbers = [...smallOddNumbers, ...bigOddNumbers];
+    const evenNumbers = [...smallEvenNumbers, ...bigEvenNumbers];
+    const smallNumbers = [...smallOddNumbers, ...smallEvenNumbers];
+    const bigNumbers = [...bigOddNumbers, ...bigEvenNumbers];
 
     const generateValidNumbers = () => {
       let numbers: number[] = [];
       const targetOddCount = oddEvenRatio !== "all" ? Number(oddEvenRatio) : -1;
       const targetSmallCount = sizeRatio !== "all" ? Number(sizeRatio) : -1;
 
-      if (targetOddCount !== -1 && targetSmallCount !== -1) {
-        // 计算每种类型需要的数量
-        const smallOddCount = Math.min(targetOddCount, targetSmallCount);
+      // 处理只有一个比例为 -1 的情况
+      if (targetOddCount === -1 && targetSmallCount === -1) {
+        numbers = getRandomUniqueNumbers(
+          Array.from({ length: 33 }, (_, i) => i + 1),
+          6,
+        );
+      } else if (targetOddCount !== -1 && targetSmallCount === -1) {
+        // 根据奇数目标数量生成对应数量的数字
+        const remainingCount = 6 - targetOddCount;
+        numbers = [
+          ...getRandomUniqueNumbers(oddNumbers, targetOddCount),
+          ...getRandomUniqueNumbers(evenNumbers, remainingCount),
+        ];
+      } else if (targetOddCount === -1 && targetSmallCount !== -1) {
+        // 根据小数目标数量生成对应数量的数字
+        const remainingCount = 6 - targetSmallCount;
+        numbers = [
+          ...getRandomUniqueNumbers(smallNumbers, targetSmallCount),
+          ...getRandomUniqueNumbers(bigNumbers, remainingCount),
+        ];
+      } else {
+        // 随机生成各数量的范围
+        const minSmallOddCount = 0; // 小数奇数的最小数量
+        const maxSmallOddCount = Math.min(targetOddCount, targetSmallCount); // 小数奇数的最大数量
+
+        const smallOddCount =
+          Math.floor(
+            Math.random() * (maxSmallOddCount - minSmallOddCount + 1),
+          ) + minSmallOddCount;
         const smallEvenCount = targetSmallCount - smallOddCount;
         const bigOddCount = targetOddCount - smallOddCount;
         const bigEvenCount = 6 - smallOddCount - smallEvenCount - bigOddCount;
@@ -121,11 +151,6 @@ const SsqNumberGenerator = () => {
           ...getRandomUniqueNumbers(bigOddNumbers, bigOddCount),
           ...getRandomUniqueNumbers(bigEvenNumbers, bigEvenCount),
         ];
-      } else {
-        numbers = getRandomUniqueNumbers(
-          Array.from({ length: 33 }, (_, i) => i + 1),
-          6,
-        );
       }
 
       // 检查和值范围

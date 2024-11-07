@@ -3,17 +3,19 @@
   width: 30px; /* 调整直径 */
   height: 30px; /* 调整直径 */
   border-radius: 50%; /* 使其为圆形 */
-
   color: white; /* 文字颜色为白色 */
   text-align: center; /* 文字居中 */
   line-height: 30px; /* 垂直居中 */
   margin-right: 5px; /* 右边距 */
+  cursor: pointer;
 }
 .red-ball{
-  background-color: #ff8383; /* 背景色为红色 */
+  background: url("/img/redCircle.png") no-repeat  ;
+  background-size: 30px auto;
 }
 .blue-ball{
-  background-color: #7c7cff; /* 背景色为蓝色 */
+  background: url("/img/blueCircle.png") no-repeat  ;
+  background-size: 30px auto;
 }
 /* 隐藏Ant Design数字输入框后的增加和减少按钮 */
 .ant-input-number-handler-wrap {

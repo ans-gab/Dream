@@ -20,14 +20,14 @@ const FilterForm = ({ params, setParams }) => {
             value={params.redOddEven}
             onChange={(e) => setParams({ ...params, redOddEven: e })}
           >
-            <Select.Option value="all">随机</Select.Option>
-            <Select.Option value="0">全偶</Select.Option>
-            <Select.Option value="1">1奇:5偶</Select.Option>
-            <Select.Option value="2">2奇:4偶</Select.Option>
-            <Select.Option value="3">3奇:3偶</Select.Option>
-            <Select.Option value="4">4奇:2偶</Select.Option>
-            <Select.Option value="5">5奇:1偶</Select.Option>
-            <Select.Option value="6">6奇:0偶</Select.Option>
+            <Select.Option value={-1}>随机</Select.Option>
+            <Select.Option value={0}>全偶</Select.Option>
+            <Select.Option value={1}>1奇:5偶</Select.Option>
+            <Select.Option value={2}>2奇:4偶</Select.Option>
+            <Select.Option value={3}>3奇:3偶</Select.Option>
+            <Select.Option value={4}>4奇:2偶</Select.Option>
+            <Select.Option value={5}>5奇:1偶</Select.Option>
+            <Select.Option value={6}>6奇:0偶</Select.Option>
           </Select>
         </Form.Item>
         <Form.Item
@@ -40,14 +40,14 @@ const FilterForm = ({ params, setParams }) => {
               setParams({ ...params, redBigSmall: e });
             }}
           >
-            <Select.Option value="all">随机</Select.Option>
-            <Select.Option value="0">0小:6大</Select.Option>
-            <Select.Option value="1">1小:5大</Select.Option>
-            <Select.Option value="2">2小:4大</Select.Option>
-            <Select.Option value="3">3小:3大</Select.Option>
-            <Select.Option value="4">4小:2大</Select.Option>
-            <Select.Option value="5">5小:1大</Select.Option>
-            <Select.Option value="6">6小:0大</Select.Option>
+            <Select.Option value={-1}>随机</Select.Option>
+            <Select.Option value={0}>0小:6大</Select.Option>
+            <Select.Option value={1}>1小:5大</Select.Option>
+            <Select.Option value={2}>2小:4大</Select.Option>
+            <Select.Option value={3}>3小:3大</Select.Option>
+            <Select.Option value={4}>4小:2大</Select.Option>
+            <Select.Option value={5}>5小:1大</Select.Option>
+            <Select.Option value={6}>6小:0大</Select.Option>
           </Select>
         </Form.Item>
         <Form.Item
@@ -84,9 +84,9 @@ const FilterForm = ({ params, setParams }) => {
               setParams({ ...params, isConsecutive: e.target.value });
             }}
           >
-            <Radio value={0}>随机</Radio>
-            <Radio value={1}>是</Radio>
-            <Radio value={2}>否</Radio>
+            <Radio value={-1}>随机</Radio>
+            <Radio value={0}>是</Radio>
+            <Radio value={1}>否</Radio>
           </Radio.Group>
         </Form.Item>
       </Row>
@@ -172,9 +172,9 @@ const FilterForm = ({ params, setParams }) => {
             }}
             style={{ width: 100 }}
           >
-            <Select.Option value="all">随机</Select.Option>
-            <Select.Option value="0">大</Select.Option>
-            <Select.Option value="1">小</Select.Option>
+            <Select.Option value={-1}>随机</Select.Option>
+            <Select.Option value={0}>大</Select.Option>
+            <Select.Option value={1}>小</Select.Option>
           </Select>
         </Form.Item>
         <Form.Item label="蓝球奇偶" style={{ marginRight: "40px" }}>
@@ -185,9 +185,9 @@ const FilterForm = ({ params, setParams }) => {
               setParams({ ...params, blueOddEven: e });
             }}
           >
-            <Select.Option value="all">随机</Select.Option>
-            <Select.Option value="0">奇</Select.Option>
-            <Select.Option value="1">偶</Select.Option>
+            <Select.Option value={-1}>随机</Select.Option>
+            <Select.Option value={0}>奇</Select.Option>
+            <Select.Option value={1}>偶</Select.Option>
           </Select>
         </Form.Item>
       </Row>

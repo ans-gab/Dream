@@ -130,12 +130,12 @@ const ForeCast = () => {
 
   return (
     <ConfigProvider locale={zhCN}>
-      <div className="main">
-        <Flex horizontal align="flex-start">
+      <div className="main-forecast">
+        <Flex align="flex-start">
           <RangePicker onChange={onDateChange} />
           <Button onClick={getData}>执行</Button>
         </Flex>
-        <Flex horizontal>
+        <Flex>
           <Table
             title={() => {
               return <h1>号码次数统计</h1>;

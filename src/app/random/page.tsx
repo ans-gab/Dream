@@ -1,22 +1,30 @@
 "use client";
 import React, { useState } from "react";
-import {
-  Button,
-  Form,
-  InputNumber,
-  notification,
-  Radio,
-  Row,
-  Select,
-  Space,
-} from "antd";
+import { notification } from "antd";
+import GenerateButtonGroup from "@/app/components/GenerateButtonGroup";
+import NumberList from "@/app/components/NumberList";
+import FilterForm from "@/app/components/FilterForm";
+import useStore from "@/app/store/useStore";
 import "./index.css";
-import { blue, red } from "next/dist/lib/picocolors";
-import { matchHas } from "next/dist/shared/lib/router/utils/prepare-destination";
-
+interface Params {
+  redOddEven: string;
+  redBigSmall: string;
+  redSumMin: number;
+  redSumMax: number;
+  isConsecutive: number;
+  redDefinite1: number;
+  redDefinite2: number;
+  redKill1: number;
+  redKill2: number;
+  bluePosition: number;
+  blueOddEven: string;
+  blueBigSmall: string;
+}
 const SsqNumberGenerator = () => {
   // 定义生成的号码
-  const [numbers, setNumbers] = useState([]);
+  const { numbers, setNumbers } = useStore();
+  // 定义是否展示机选条件
+  const [showMachine, setShowMachine] = useState(false);
   // 定义条件参数对象，并限制params的对象属性，例如ts的type那种
   const [params, setParams] = useState({
     //   红球奇偶比
@@ -70,11 +78,6 @@ const SsqNumberGenerator = () => {
   const largeOddBlueNumbers = [9, 11, 13, 15]; // 蓝球大奇数
   const largeEvenBlueNumbers = [10, 12, 14, 16]; // 蓝球大偶数
 
-  // 红球最小和值
-  const [redSumMin, setRedSumMin] = useState(21);
-  // 红球最大和值
-  const [redSumMax, setRedSumMax] = useState(183);
-
   // 生成蓝色号码
   const getBlueRandom = () => {
     let blueNumber = "";
@@ -83,43 +86,47 @@ const SsqNumberGenerator = () => {
     if (params.bluePosition !== "") {
       blueNumber = params.bluePosition;
     } else if (params.blueOddEven === "all" && params.blueBigSmall === "all") {
-      blueNumber = Math.floor(Math.random() * 16) + 1;
+      blueNumber = (Math.floor(Math.random() * 16) + 1).toString();
     } else if (params.blueOddEven === "0" && params.blueBigSmall === "all") {
-      blueNumber = oddBlueNumbers[Math.floor(Math.random() * 8)];
+      blueNumber = oddBlueNumbers[Math.floor(Math.random() * 8)].toString();
     } else if (params.blueOddEven === "1" && params.blueBigSmall === "all") {
-      blueNumber = evenBlueNumbers[Math.floor(Math.random() * 8)];
+      blueNumber = evenBlueNumbers[Math.floor(Math.random() * 8)].toString();
     } else if (params.blueOddEven === "all" && params.blueBigSmall === "0") {
-      blueNumber = largeBlueNumbers[Math.floor(Math.random() * 8)];
+      blueNumber = largeBlueNumbers[Math.floor(Math.random() * 8)].toString();
     } else if (params.blueOddEven === "all" && params.blueBigSmall === "1") {
-      blueNumber = smallBlueNumbers[Math.floor(Math.random() * 8)];
+      blueNumber = smallBlueNumbers[Math.floor(Math.random() * 8)].toString();
     } else if (params.blueOddEven === "0" && params.blueBigSmall === "0") {
-      blueNumber = largeOddBlueNumbers[Math.floor(Math.random() * 4)];
+      blueNumber =
+        largeOddBlueNumbers[Math.floor(Math.random() * 4)].toString();
     } else if (params.blueOddEven === "1" && params.blueBigSmall === "1") {
-      blueNumber = smallEvenBlueNumbers[Math.floor(Math.random() * 4)];
+      blueNumber =
+        smallEvenBlueNumbers[Math.floor(Math.random() * 4)].toString();
     } else if (params.blueOddEven === "0" && params.blueBigSmall === "1") {
-      blueNumber = smallOddBlueNumbers[Math.floor(Math.random() * 4)];
+      blueNumber =
+        smallOddBlueNumbers[Math.floor(Math.random() * 4)].toString();
     } else if (params.blueOddEven === "1" && params.blueBigSmall === "0") {
-      blueNumber = largeEvenBlueNumbers[Math.floor(Math.random() * 4)];
+      blueNumber =
+        largeEvenBlueNumbers[Math.floor(Math.random() * 4)].toString();
     } else if (params.bluePosition === "") {
-      blueNumber = Math.floor(Math.random() * 16) + 1;
+      blueNumber = (Math.floor(Math.random() * 16) + 1).toString();
     }
     return blueNumber;
   };
 
   // 红球奇偶如果是0:6就是全是偶数，大小比是以16为分界线，小于16为小，大于16为大，红球是否连号代表着是否出现有连续的数字。请根据上面的条件，红球号码的和值范围，根据不同的选项返回不同的和值范围,帮我返回正确的最小值和最大值
   function generateRedBalls(
-    oddEvenRatio,
-    sizeRatio,
-    sumMin,
-    sumMax,
-    isConsecutive,
-    redDefinite1,
-    redDefinite2,
-    redKill1,
-    redKill2,
+    oddEvenRatio: string | number,
+    sizeRatio: string | number,
+    sumMin: number,
+    sumMax: number,
+    isConsecutive: number,
+    redDefinite1: number,
+    redDefinite2: number,
+    redKill1: string,
+    redKill2: string,
   ) {
     const allNumbers = Array.from({ length: 33 }, (_, i) => i + 1); // 1 到 33 的所有红球号码
-    const maxAttempts = 10000; // 最大尝试次数
+    const maxAttempts = 1000; // 最大尝试次数
     let selectedNumbers = [];
     let attempts = 0;
     let sumFlag = false; // 用于标记和值是否符合条件
@@ -143,13 +150,25 @@ const SsqNumberGenerator = () => {
     ).length;
 
     // 判断定胆的数字是否符合奇偶比和大小比的条件
+
     if (
+      // @ts-ignore
       smallOddNumbersCount + smallEvenNumbersCount > sizeRatio ||
+      // @ts-ignore
       smallOddNumbersCount + largeOddNumbersCount > oddEvenRatio
     ) {
       //   提示定胆数字不符合奇偶比和大小比的条件
       notification.error({
         message: "定胆数字不符合奇偶比和大小比的条件",
+      });
+      return;
+    } else if (
+      (oddEvenRatio === "0" || oddEvenRatio === "6") &&
+      isConsecutive === 1
+    ) {
+      //   提示定胆数字不符合奇偶比和大小比的条件
+      notification.error({
+        message: "定胆数字不符合奇偶比和连号的条件",
       });
       return;
     }
@@ -166,43 +185,47 @@ const SsqNumberGenerator = () => {
         sumMin === 21 &&
         sumMax === 183 &&
         isConsecutive === 0 &&
-        redDefinite1 === "" &&
-        redDefinite2 === ""
+        redDefinite1 === null &&
+        redDefinite2 === null
       ) {
         selectedNumbers = getRandomUniqueNumbers(allNumbers, 6);
       } else {
-        let oddCount, evenCount, smallCount, largeCount;
+        let oddCount: number, evenCount, smallCount: number, largeCount;
         // 处理奇偶比
         if (oddEvenRatio === "all") {
-          // 设置奇数数量为smallOddNumbers + largeOddNumbers到6之间的随机值
-          oddCount =
-            Math.floor(
-              Math.random() *
-                (6 - (smallOddNumbersCount + largeOddNumbersCount) + 1),
-            ) +
-            (smallOddNumbersCount + largeOddNumbersCount);
+          // 设置奇数数量的最小值和最大值
+          const minOddCount = smallOddNumbersCount + largeOddNumbersCount; // 奇数数量的最小值
+          const maxOddCount =
+            6 - (smallEvenNumbersCount + largeEvenNumbersCount); // 奇数数量的最大值
+          oddCount = Math.floor(
+            Math.random() * (maxOddCount - minOddCount + 1) + minOddCount,
+          );
         } else {
-          oddCount = oddEvenRatio;
+          oddCount = Number(oddEvenRatio);
         }
 
         evenCount = 6 - oddCount; // 剩余为偶数
 
         // 处理大小比
         if (sizeRatio === "all") {
+          // 设置小数数量的最小值和最大值
+          const minSmallCount = smallOddNumbersCount + smallEvenNumbersCount; // 小数数量的最小值
+          const maxSmallCount =
+            6 - (largeOddNumbersCount + largeEvenNumbersCount); // 小数数量的最大值
           smallCount = Math.floor(
-            Math.random() *
-              (6 - (smallOddNumbersCount + smallEvenNumbersCount)) +
-              (smallOddNumbersCount + smallEvenNumbersCount),
-          ); // 随机生成小数数量（0-6）
+            Math.random() * (maxSmallCount - minSmallCount + 1) + minSmallCount,
+          );
         } else {
-          smallCount = sizeRatio;
+          smallCount = Number(sizeRatio);
         }
         largeCount = 6 - smallCount; // 剩余为大数
-        let smallOddCount = "";
-        let largeEvenCount = "";
+        let smallOddCount;
+        let largeEvenCount;
         // 设置小奇数的数量最小值为smallOddNumbersCount, 最大值为smallCount和oddCount的最小值
-        if (smallCount === "6" && oddCount === "6") {
+        if (smallCount === 6 && oddCount === 6) {
           smallOddCount = 6;
+        } else if (smallCount === 0 && oddCount === 0) {
+          smallOddCount = 0;
         } else {
           smallOddCount =
             Math.max(smallOddNumbersCount, 0) +
@@ -211,8 +234,10 @@ const SsqNumberGenerator = () => {
                 (Math.min(smallCount, oddCount) - smallOddNumbersCount + 1),
             );
         }
-        if (largeCount === "6" && evenCount === "6") {
-          largeEvenCount = "6";
+        if (largeCount === 6 && evenCount === 6) {
+          largeEvenCount = 6;
+        } else if (largeCount === 0 && evenCount === 0) {
+          largeEvenCount = 0;
         } else {
           largeEvenCount =
             Math.max(largeEvenNumbersCount, 0) +
@@ -263,8 +288,8 @@ const SsqNumberGenerator = () => {
           }
 
           if (uniqueKillNumbers.length > 0) {
-            const filterKillNumbers = (numbers) =>
-              numbers.filter((num) => !uniqueKillNumbers.includes(num));
+            const filterKillNumbers = (numbers: any[]) =>
+              numbers.filter((num: string) => !uniqueKillNumbers.includes(num));
             smallOddNumbers = filterKillNumbers(smallOddNumbers);
             smallEvenNumbers = filterKillNumbers(smallEvenNumbers);
             largeOddNumbers = filterKillNumbers(largeOddNumbers);
@@ -332,7 +357,7 @@ const SsqNumberGenerator = () => {
   }
 
   // 检验数组中是否存在任意相邻的数字，只要存在相邻的数字就返回true，否则返回false
-  function checkConsecutive(numbers) {
+  function checkConsecutive(numbers: string | any[]) {
     for (let i = 0; i < numbers.length - 1; i++) {
       if (numbers[i] + 1 === numbers[i + 1]) {
         return true;
@@ -342,8 +367,8 @@ const SsqNumberGenerator = () => {
   }
 
   // 随机选择不重复的红球数字
-  function getRandomUniqueNumbers(pool, count) {
-    const result = [];
+  function getRandomUniqueNumbers(pool: string | any[], count: number) {
+    const result: any[] = [];
     while (result.length < count) {
       const randomIndex = Math.floor(Math.random() * pool.length);
       const number = pool[randomIndex];
@@ -356,15 +381,17 @@ const SsqNumberGenerator = () => {
   }
 
   // 生成组合号码
-  const generateNumbers = (count) => {
+  const generateNumbers = (count: number) => {
     const newNumbers = [];
     for (let i = 0; i < count; i++) {
+      // @ts-ignore
       const redBalls = generateRedBalls(
         params.redOddEven,
         params.redBigSmall,
         params.redSumMin,
         params.redSumMax,
         params.isConsecutive,
+        // @ts-ignore
         params.redDefinite1,
         params.redDefinite2,
         params.redKill1,
@@ -374,260 +401,33 @@ const SsqNumberGenerator = () => {
       const newNumber = `${redBalls.join(",")} + ${blueBall}`;
       newNumbers.push(newNumber);
     }
+    // 修改之前的代码使用 template literal, 直接用换行符替代并且避免 JSX 语法
     setNumbers([...numbers, ...newNumbers]);
     notification.success({
       message: "生成成功",
-      description: `生成的号码为: ${newNumbers.join("; ")}`,
+      description: (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `生成的号码为:<br/> ${newNumbers.join("; <br/>")}`,
+          }}
+        />
+      ),
     });
   };
 
+  //
   return (
-    <div className="main">
-      <Form layout="inline">
-        <Form.Item>
-          <Space>
-            <Button type="primary" onClick={() => generateNumbers(1)}>
-              机选一注
-            </Button>
-            <Button type="primary" onClick={() => generateNumbers(5)}>
-              机选五注
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => {
-                setParams({
-                  //   红球奇偶比
-                  redOddEven: "all",
-                  //   红球大小比
-                  redBigSmall: "all",
-                  //   红球和值最小值
-                  redSumMin,
-                  //   红球和值最大值
-                  redSumMax,
-                  //   是否产生连号
-                  isConsecutive: 0,
-                  //   红球定胆
-                  redDefinite1: "",
-                  redDefinite2: "",
-                  //   红球杀号
-                  redKill1: "",
-                  redKill2: "",
-                  //   蓝球定胆
-                  bluePosition: [],
-                  //   蓝球奇偶比
-                  blueOddEven: "all",
-                  //   蓝球大小比
-                  blueBigSmall: "all",
-                });
-                setNumbers([]);
-              }}
-            >
-              清空
-            </Button>
-          </Space>
-        </Form.Item>
-      </Form>
-      <Form>
-        <Row>
-          <h3 style={{ color: "red" }}>红球过滤条件</h3>
-        </Row>
-        <Row>
-          <Form.Item
-            label="奇偶比"
-            style={{ width: "200px", marginRight: "20px" }}
-          >
-            <Select
-              value={params.redOddEven}
-              onChange={(e) => setParams({ ...params, redOddEven: e })}
-            >
-              <Select.Option value="all">随机</Select.Option>
-              <Select.Option value="0">全偶</Select.Option>
-              <Select.Option value="1">1奇:5偶</Select.Option>
-              <Select.Option value="2">2奇:4偶</Select.Option>
-              <Select.Option value="3">3奇:3偶</Select.Option>
-              <Select.Option value="4">4奇:2偶</Select.Option>
-              <Select.Option value="5">5奇:1偶</Select.Option>
-              <Select.Option value="6">6奇:0偶</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="大小比"
-            style={{ width: "200px", marginRight: "20px" }}
-          >
-            <Select
-              value={params.redBigSmall}
-              onChange={(e) => {
-                setParams({ ...params, redBigSmall: e });
-              }}
-            >
-              <Select.Option value="all">随机</Select.Option>
-              <Select.Option value="0">0小:6大</Select.Option>
-              <Select.Option value="1">1小:5大</Select.Option>
-              <Select.Option value="2">2小:4大</Select.Option>
-              <Select.Option value="3">3小:3大</Select.Option>
-              <Select.Option value="4">4小:2大</Select.Option>
-              <Select.Option value="5">5小:1大</Select.Option>
-              <Select.Option value="6">6小:0大</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="和值范围"
-            style={{ width: "280px", marginRight: "20px" }}
-          >
-            <InputNumber
-              value={params.redSumMin}
-              min={redSumMin}
-              defaultValue={redSumMin}
-              style={{ with: 20 }}
-              onChange={(e) => setParams({ ...params, redSumMin: e })}
-            />
-            到
-            <InputNumber
-              value={params.redSumMax}
-              max={redSumMax}
-              defaultValue={redSumMax}
-              style={{ with: 20 }}
-              onChange={(e) => setParams({ ...params, redSumMax: e })}
-            />
-          </Form.Item>
-          <Form.Item
-            label="产生连号"
-            style={{ width: "250px", marginRight: "20px" }}
-          >
-            <Radio.Group
-              value={params.isConsecutive}
-              onChange={(e) => {
-                setParams({ ...params, isConsecutive: e.target.value });
-              }}
-            >
-              <Radio value={0}>随机</Radio>
-              <Radio value={1}>是</Radio>
-              <Radio value={2}>否</Radio>
-            </Radio.Group>
-          </Form.Item>
-        </Row>
-        <Row>
-          <Form.Item label="红球定胆" style={{ marginRight: "20px" }}>
-            <InputNumber
-              value={params.redDefinite1}
-              min={1}
-              max={33}
-              style={{ with: 20 }}
-              onChange={(e) =>
-                setParams({
-                  ...params,
-                  redDefinite1: e,
-                })
-              }
-            />
-            <InputNumber
-              value={params.redDefinite2}
-              min={1}
-              max={33}
-              style={{ with: 20 }}
-              onChange={(e) =>
-                setParams({
-                  ...params,
-                  redDefinite2: e,
-                })
-              }
-            />
-          </Form.Item>
-          <Form.Item label="红球杀号">
-            <InputNumber
-              value={params.redKill1}
-              min={1}
-              max={33}
-              style={{ with: 20 }}
-              onChange={(e) =>
-                setParams({
-                  ...params,
-                  redKill1: e,
-                })
-              }
-            />
-            <InputNumber
-              value={params.redKill2}
-              min={1}
-              max={33}
-              style={{ with: 20 }}
-              onChange={(e) =>
-                setParams({
-                  ...params,
-                  redKill2: e,
-                })
-              }
-            />
-          </Form.Item>
-        </Row>
-        <Row>
-          <h3 style={{ color: "blue" }}>蓝球过滤条件</h3>
-        </Row>
-        <Row>
-          <Form.Item label="蓝球定位" style={{ marginRight: "20px" }}>
-            <InputNumber
-              value={params.bluePosition}
-              onChange={(e) => {
-                setParams({ ...params, bluePosition: e || "" });
-              }}
-              min={1}
-              max={16}
-              style={{ with: 20 }}
-            />
-          </Form.Item>
-          <Form.Item label="蓝球大小" style={{ marginRight: "20px" }}>
-            <Select
-              value={params.blueBigSmall}
-              onChange={(e) => {
-                setParams({ ...params, blueBigSmall: e });
-              }}
-              style={{ width: 100 }}
-            >
-              <Select.Option value="all">随机</Select.Option>
-              <Select.Option value="0">大</Select.Option>
-              <Select.Option value="1">小</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item label="蓝球奇偶" style={{ marginRight: "40px" }}>
-            <Select
-              value={params.blueOddEven}
-              style={{ width: 100 }}
-              onChange={(e) => {
-                setParams({ ...params, blueOddEven: e });
-              }}
-            >
-              <Select.Option value="all">随机</Select.Option>
-              <Select.Option value="0">奇</Select.Option>
-              <Select.Option value="1">偶</Select.Option>
-            </Select>
-          </Form.Item>
-        </Row>
-      </Form>
-      <div style={{ marginTop: 16 }}>
-        <h3>生成的号码列表:</h3>
-        <ul>
-          {numbers.map((num, index) => {
-            const redNumbers = num
-              .split(",")
-              .slice(0, -1)
-              .concat(num.split(",").slice(-1)[0].split(" ")[0]); // 拆分红球号码，去除最后一个数字
-            const blueNumber = num.split(" + ")[1]; // 获取蓝球号码
-            return (
-              <li
-                key={index}
-                style={{ listStyle: "none", padding: "10px 0px" }}
-              >
-                {redNumbers.map((digit, idx) => (
-                  <span className="circle red-ball" key={idx}>
-                    {digit}
-                  </span>
-                ))}
-                <span className="circle blue-ball">{blueNumber}</span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+    <div className="main-random">
+      <NumberList numbers={numbers} setNumbers={setNumbers} />
+      <GenerateButtonGroup
+        generateNumbers={generateNumbers}
+        setShowMachine={setShowMachine}
+        showMachine={showMachine}
+        // @ts-ignore
+        params={params}
+        setParams={setParams}
+      />
+      {showMachine && <FilterForm params={params} setParams={setParams} />}
     </div>
   );
 };

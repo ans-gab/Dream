@@ -1,0 +1,31 @@
+ul.select-number-list {
+  height: 280px;
+  display: flex;
+  flex-direction: column; /* 设置为垂直方向 */
+  align-items: start; /* 水平居中对齐 */
+  justify-content: start; /* 垂直居中对齐 */
+  /* 使容器充满视口高度 */
+  padding: 10px 0;
+  overflow: auto;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  border: 1px solid #55d0d5;
+  background: #8493a1;
+}
+/*设置ul的滚动条的样式*/
+ul.select-number-list::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+ul.select-number-list::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+ul.select-number-list li{
+  list-style: none;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #91caff;
+  padding: 3px;
+  margin: 5px;
+}

@@ -5,8 +5,16 @@ import { InputNumber, Tooltip } from "antd";
 import "./ball.css";
 
 // @ts-ignore
-const RedBall = ({ numbers, editable = false }) => {
+
+interface RedBallProps {
+  numbers?: string;
+  editable?: boolean;
+  isChoose?: boolean;
+}
+
+const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
   const { data } = useStore();
+  // @ts-ignore
   const [numberList, setNumberList] = useState(numbers.split(","));
   const [editIndex, setEditIndex] = useState(-1);
 
@@ -41,6 +49,8 @@ const RedBall = ({ numbers, editable = false }) => {
     if (editable) {
       setEditIndex(index);
     }
+    if (isChoose) {
+    }
   };
 
   const handleBlur = () => {
@@ -60,8 +70,8 @@ const RedBall = ({ numbers, editable = false }) => {
             onChange={(value) => handleInputChange(index, value)}
             onBlur={handleBlur}
             changeOnWheel
-            min={1}
-            max={33}
+            min={"1"}
+            max={"33"}
             width={30}
             style={{
               background: "transparent",

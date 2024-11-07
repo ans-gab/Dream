@@ -5,11 +5,19 @@ import useStore from "@/app/store/useStore";
 import "./ball.css";
 
 // @ts-ignore
-const BlueBall = ({ numbers, editable = false }) => {
+interface BlueBallProps {
+  numbers?: string;
+  editable?: boolean;
+  isChoose?: boolean;
+}
+
+const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
   const { data } = useStore();
+  // @ts-ignore
   const initialNumbers = numbers.split(",");
   const [numberList, setNumberList] = useState(initialNumbers);
   const [editIndex, setEditIndex] = useState(-1);
+
   // 根据传入的参数，统计当前红球号码出现的次数;
   function getCount(num: any) {
     let count = 0;
@@ -20,6 +28,7 @@ const BlueBall = ({ numbers, editable = false }) => {
     });
     return count;
   }
+
   // 定义提示信息
   const tooltip = (num: any) => {
     let count = getCount(num);
@@ -62,8 +71,8 @@ const BlueBall = ({ numbers, editable = false }) => {
             onChange={(value) => handleInputChange(index, value)}
             onBlur={handleBlur}
             changeOnWheel
-            min={1} // 设置最小值
-            max={16} // 设置最大值
+            min={"1"} // 设置最小值
+            max={"16"} // 设置最大值
             width={30}
             style={{
               background: "transparent",

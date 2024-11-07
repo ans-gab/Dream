@@ -151,8 +151,8 @@ const ForeCast = ({
           <RangePicker
             onChange={onDateChange}
             defaultValue={[
-              dayjs(searchParams?.startDate),
-              dayjs(searchParams?.endDate),
+              searchParams?.startDate ? dayjs(searchParams.startDate) : null,
+              searchParams?.endDate ? dayjs(searchParams.endDate) : null,
             ]}
           />
           <Button onClick={processData}>执行</Button>

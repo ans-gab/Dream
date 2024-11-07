@@ -23,8 +23,7 @@ interface Params {
   blueBigSmall: string | number;
 }
 
-// SsqNumberGenerator 组件
-const SsqNumberGenerator = (totalSum: number) => {
+const SsqNumberGenerator = () => {
   const { numbers, setNumbers } = useStore(); // 从状态管理中获取号码和设置号码的函数
   const [showMachine, setShowMachine] = useState(false); // 控制是否展示机选条件
   const [params, setParams] = useState({

@@ -61,8 +61,20 @@ export default function Home() {
       <div className="main">
         <SlideBar />
         <div className="right-slide">
-          {currentPage === "recordList" && <RecordList />}
-          {currentPage === "forecast" && <ForeCast />}
+          {currentPage === "recordList" && (
+            <RecordList
+              getData={getData}
+              searchParams={searchParams}
+              setSearchParams={setSearchParams}
+            />
+          )}
+          {currentPage === "forecast" && (
+            <ForeCast
+              getData={getData}
+              searchParams={searchParams}
+              setSearchParams={setSearchParams}
+            />
+          )}
           {currentPage === "randomSSQ" && <SsqNumberGenerator />}
         </div>
       </div>

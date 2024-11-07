@@ -6,59 +6,60 @@ import "moment/locale/zh-cn";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import "./index.css";
+import useStore from "@/app/store/useStore";
+
 const { RangePicker } = DatePicker;
 
-const ForeCast = () => {
-  const [data, setData] = useState([]);
+interface SearchParams {
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+interface ForeCastProps {
+  getData?: () => void;
+  searchParams?: SearchParams;
+  setSearchParams?: (
+    value: ((prevState: SearchParams) => SearchParams) | SearchParams,
+  ) => void;
+}
+
+interface ForeCastProps {
+  getData?: () => void;
+}
+
+const ForeCast = ({
+  getData,
+  searchParams,
+  setSearchParams,
+}: ForeCastProps) => {
+  const { data, setData, currentPage } = useStore();
   // 定义搜索参数
-  const [searchParams, setSearchParams] = useState({});
 
   // 号码次数统计
   const [countArray, setCountArray] = useState([]);
 
   // 修改日期更改处理函数
-  const onDateChange = (dates, dateStrings) => {
+  const onDateChange = (dates: any, dateStrings: any[]) => {
     if (dates) {
-      setSearchParams({
+      setSearchParams?.({
         ...searchParams,
         startDate: dateStrings[0],
         endDate: dateStrings[1],
       });
     } else {
-      setSearchParams({ ...searchParams, startDate: null, endDate: null });
+      setSearchParams?.({ ...searchParams, startDate: null, endDate: null });
     }
   };
 
   // 在获取数据时使用搜索参数
-  function getData() {
-    fetch("data.json")
-      .then((response) => response.json())
-      .then((res) => {
-        let dataArr = res.result;
-
-        // 根据日期筛选数据
-        if (searchParams.startDate && searchParams.endDate) {
-          dataArr = dataArr.filter((item) => {
-            const date = new Date(item.date); // 假设item.date是彩票的开奖日期
-            return (
-              date >= new Date(searchParams.startDate) &&
-              date <= new Date(searchParams.endDate)
-            );
-          });
-        }
-        setData(dataArr);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
 
   function processData() {
+    getData?.();
     // 使用reduce统计红球和蓝球的数量
     const { redNumsCount, blueNumsCount } = data.reduce(
       (acc, item) => {
         // 将红球号码添加到统计
-        item.red.split(",").forEach((num) => {
+        item.red.split(",").forEach((num: string | number) => {
           acc.redNumsCount[num] = (acc.redNumsCount[num] || 0) + 1;
         });
         // 将蓝球号码添加到统计
@@ -83,19 +84,18 @@ const ForeCast = () => {
     // 将红球次数和蓝球次数两个数组进行合并为一个新的数组
     const countsArray = [...redCountsArray, ...blueCountsArray];
 
+    // @ts-ignore
     setCountArray(countsArray);
   }
+
   // 设置日期组件中的文字为中文
   dayjs.locale("zh-cn");
-  useEffect(() => {
-    getData();
-  }, []);
 
   useEffect(() => {
     if (data.length > 0) {
       processData();
     }
-  }, [data]);
+  }, []);
 
   const countColumns = [
     {
@@ -104,7 +104,10 @@ const ForeCast = () => {
       key: "数字",
       width: 100,
       defaultSortOrder: "ascend",
-      sorter: (a, b) => {
+      sorter: (
+        a: { key: string; num: number },
+        b: { key: string; num: number },
+      ) => {
         const aIsRed = a.key.startsWith("red-");
         const bIsRed = b.key.startsWith("red-");
 
@@ -113,7 +116,20 @@ const ForeCast = () => {
 
         return a.num - b.num;
       },
-      render: (text, record) => {
+      render: (
+        text:
+          | string
+          | number
+          | bigint
+          | boolean
+          | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+          | Iterable<React.ReactNode>
+          | React.ReactPortal
+          | Promise<React.AwaitedReactNode>
+          | null
+          | undefined,
+        record: { key: string },
+      ) => {
         const isRed = record.key.startsWith("red-");
         const className = isRed ? "circle red-ball" : "circle blue-ball";
         return <span className={className}>{text}</span>;
@@ -124,7 +140,7 @@ const ForeCast = () => {
       dataIndex: "count",
       key: "次数",
       width: 100,
-      sorter: (a, b) => a.count - b.count,
+      sorter: (a: { count: number }, b: { count: number }) => a.count - b.count,
     },
   ];
 
@@ -132,8 +148,14 @@ const ForeCast = () => {
     <ConfigProvider locale={zhCN}>
       <div className="main-forecast">
         <Flex align="flex-start">
-          <RangePicker onChange={onDateChange} />
-          <Button onClick={getData}>执行</Button>
+          <RangePicker
+            onChange={onDateChange}
+            defaultValue={[
+              dayjs(searchParams?.startDate),
+              dayjs(searchParams?.endDate),
+            ]}
+          />
+          <Button onClick={processData}>执行</Button>
         </Flex>
         <Flex>
           <Table
@@ -141,6 +163,7 @@ const ForeCast = () => {
               return <h1>号码次数统计</h1>;
             }}
             size="small"
+            // @ts-ignore
             columns={countColumns}
             dataSource={countArray}
             rowKey="key"

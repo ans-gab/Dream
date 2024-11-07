@@ -21,9 +21,27 @@ interface LotteryData {
   blue: number;
 }
 
-export default function RecordList() {
+interface RecordListProps {
+  getData?: () => void;
+  searchParams?: SearchParams;
+  setSearchParams?: (
+    value: ((prevState: SearchParams) => SearchParams) | SearchParams,
+  ) => void;
+}
+
+interface RangePickerProps {
+  onChange?: (
+    dates: [dayjs.Dayjs | null, dayjs.Dayjs | null],
+    dateStrings: [string, string],
+  ) => void;
+}
+
+const RecordList = ({
+  getData,
+  searchParams,
+  setSearchParams,
+}: RecordListProps) => {
   const { data, setData } = useStore();
-  const [searchParams, setSearchParams] = useState<SearchParams>({});
   const { RangePicker } = DatePicker;
 
   const onDateChange = (
@@ -31,45 +49,20 @@ export default function RecordList() {
     dateStrings: [string, string],
   ) => {
     if (dates) {
-      setSearchParams({
+      setSearchParams?.({
         ...searchParams,
         startDate: dateStrings[0],
         endDate: dateStrings[1],
       });
     } else {
-      setSearchParams({ ...searchParams, startDate: null, endDate: null });
+      setSearchParams?.({ ...searchParams, startDate: null, endDate: null });
     }
-  };
-
-  const getData = () => {
-    fetch("data.json")
-      .then((response) => response.json())
-      .then((res: { result: LotteryData[] }) => {
-        let dataArr = res.result;
-
-        if (searchParams.startDate && searchParams.endDate) {
-          dataArr = dataArr.filter((item) => {
-            const date = new Date(item.date);
-
-            return (
-              // @ts-ignore
-              date >= new Date(searchParams.startDate) &&
-              // @ts-ignore
-              date <= new Date(searchParams.endDate)
-            );
-          });
-        }
-        setData(dataArr);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
   };
 
   dayjs.locale("zh-cn");
 
   useEffect(() => {
-    getData();
+    getData?.();
   }, []);
 
   const columns = [
@@ -112,8 +105,14 @@ export default function RecordList() {
   return (
     <ConfigProvider locale={zhCN}>
       <Flex align="flex-start">
-        {/* @ts-ignore */}
-        <RangePicker onChange={onDateChange} />
+        <RangePicker
+          // @ts-ignore
+          onChange={onDateChange}
+          defaultValue={[
+            dayjs(searchParams?.startDate),
+            dayjs(searchParams?.endDate),
+          ]}
+        />
         <Button onClick={getData}>查询</Button>
       </Flex>
       <Table
@@ -125,4 +124,6 @@ export default function RecordList() {
       />
     </ConfigProvider>
   );
-}
+};
+
+export default RecordList;

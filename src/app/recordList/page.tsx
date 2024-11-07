@@ -83,22 +83,13 @@ const RecordList = ({
       title: "开奖号码",
       key: "开奖号码",
       width: 200,
-      children: [
-        {
-          title: "红球号码",
-          dataIndex: "red",
-          key: "红球号码",
-          width: 150,
-          render: (text: number[]) => <RedBall numbers={text} />,
-        },
-        {
-          title: "蓝球号码",
-          dataIndex: "blue",
-          key: "蓝球号码",
-          width: 50,
-          render: (text: number) => <BlueBall numbers={text} />,
-        },
-      ],
+      dataIndex: "winningNumbers",
+      render: (text: string[]) => (
+        <>
+          <RedBall numbers={text[0]} />
+          <BlueBall numbers={text[1]} />
+        </>
+      ),
     },
   ];
 
@@ -109,8 +100,8 @@ const RecordList = ({
           // @ts-ignore
           onChange={onDateChange}
           defaultValue={[
-            dayjs(searchParams?.startDate),
-            dayjs(searchParams?.endDate),
+            searchParams?.startDate ? dayjs(searchParams.startDate) : null,
+            searchParams?.endDate ? dayjs(searchParams.endDate) : null,
           ]}
         />
         <Button onClick={getData}>查询</Button>

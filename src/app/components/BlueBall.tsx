@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InputNumber, Tooltip } from "antd"; // 引入 Ant Design 的 InputNumber
 import useStore from "@/app/store/useStore";
 import "./ball.css";
@@ -17,6 +17,17 @@ const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
   const initialNumbers = numbers.split(",");
   const [numberList, setNumberList] = useState(initialNumbers);
   const [editIndex, setEditIndex] = useState(-1);
+
+  // 定义是否被选中
+  const [selectStates, setSelectStates] = useState<string[]>(
+    Array(numberList.length).fill("circle blue-ball"),
+  );
+  const { chooseNumber, setChooseNumbersNumber } = useStore();
+
+  // 初始加载时，默认都没有选中
+  useEffect(() => {
+    setSelectStates(Array(numberList.length).fill("circle blue-ball"));
+  }, [initialNumbers]);
 
   // 根据传入的参数，统计当前红球号码出现的次数;
   function getCount(num: any) {
@@ -44,9 +55,23 @@ const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
     setNumberList(updatedList);
   };
 
-  const handleClick = (index: React.SetStateAction<number>) => {
+  const handleClick = (item: string, index: React.SetStateAction<number>) => {
     if (editable) {
       setEditIndex(index);
+    }
+    if (isChoose) {
+      const updatedSelectStates = [...selectStates];
+      // @ts-ignore
+      if (updatedSelectStates[index] === "circle blue-ball") {
+        updatedSelectStates[index] = "circle blue-ball choose";
+        let newChooseNumber = [...chooseNumber, item];
+        setChooseNumbersNumber(newChooseNumber);
+      } else {
+        updatedSelectStates[index] = "circle blue-ball";
+        let newChooseNumber = chooseNumber.filter((num) => num !== item);
+        setChooseNumbersNumber(newChooseNumber);
+      }
+      setSelectStates(updatedSelectStates);
     }
   };
 
@@ -62,8 +87,8 @@ const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
     <Tooltip title={tooltip(item)} key={item}>
       <span
         key={item}
-        className="circle blue-ball"
-        onClick={() => handleClick(index)}
+        className={selectStates[index]}
+        onClick={() => handleClick(item, index)}
       >
         {editIndex === index ? (
           <InputNumber

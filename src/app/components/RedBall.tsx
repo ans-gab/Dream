@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useStore from "@/app/store/useStore"; // 引入 Zustand store
 import { InputNumber, Tooltip } from "antd";
 import "./ball.css";
@@ -17,7 +17,17 @@ const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
   // @ts-ignore
   const [numberList, setNumberList] = useState(numbers.split(","));
   const [editIndex, setEditIndex] = useState(-1);
+  // 定义是否被选中
+  const [selectStates, setSelectStates] = useState<string[]>(
+    Array(numberList.length).fill("circle red-ball"),
+  );
+  const { chooseNumber, setChooseNumbersNumber } = useStore();
+  // 初始加载时，默认都没有选中
+  useEffect(() => {
+    setSelectStates(Array(numberList.length).fill("circle red-ball"));
+  }, [numbers]);
 
+  // 定义选中的号码、
   function getCount(num: any) {
     let count = 0;
     data.forEach((item) => {
@@ -45,11 +55,28 @@ const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
     }
   };
 
-  const handleClick = (index: React.SetStateAction<number>) => {
+  const handleClick = (item: string, index: React.SetStateAction<number>) => {
     if (editable) {
       setEditIndex(index);
     }
+
     if (isChoose) {
+      const updatedSelectStates = [...selectStates];
+      if (updatedSelectStates[index] === "circle red-ball") {
+        if (chooseNumber.length < 6) {
+          updatedSelectStates[index] = "circle red-ball choose";
+          let newChooseNumber = [...chooseNumber, item];
+          setChooseNumbersNumber(newChooseNumber);
+        } else {
+          // Optionally, you can alert the user or handle the excess item case here
+          console.log("Cannot select more than 6 balls.");
+        }
+      } else {
+        updatedSelectStates[index] = "circle red-ball";
+        let newChooseNumber = chooseNumber.filter((num) => num !== item);
+        setChooseNumbersNumber(newChooseNumber);
+      }
+      setSelectStates(updatedSelectStates);
     }
   };
 
@@ -63,7 +90,10 @@ const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
   // @ts-ignore
   return numberList.map((item, index) => (
     <Tooltip title={tooltip(item)} key={item}>
-      <span className="circle red-ball" onClick={() => handleClick(index)}>
+      <span
+        className={selectStates[index]}
+        onClick={() => handleClick(item, index)}
+      >
         {editIndex === index ? (
           <InputNumber
             value={item}

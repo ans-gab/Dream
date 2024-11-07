@@ -6,7 +6,14 @@ const GenerateButtonGroup: React.FC<{
   setShowMachine: (show: boolean) => void;
   showMachine: boolean;
   setParams: (params: any) => void;
-}> = ({ generateNumbers, setShowMachine, showMachine, setParams }) => {
+  setIsOpen?: (value: ((prevState: boolean) => boolean) | boolean) => void;
+}> = ({
+  generateNumbers,
+  setShowMachine,
+  showMachine,
+  setParams,
+  setIsOpen,
+}) => {
   // 将搜索参数重置
   const resetParams = () => {
     setParams({
@@ -28,6 +35,7 @@ const GenerateButtonGroup: React.FC<{
       blueBigSmall: "all",
     });
   };
+
   return (
     <Space>
       <Button type="primary" onClick={() => generateNumbers(1)}>
@@ -48,7 +56,9 @@ const GenerateButtonGroup: React.FC<{
       <Button type="primary" onClick={resetParams}>
         清空搜索参数
       </Button>
-      <Button type="primary">自选号码</Button>
+      <Button type="primary" onClick={() => setIsOpen?.(true)}>
+        自选号码
+      </Button>
     </Space>
   );
 };

@@ -6,6 +6,7 @@ import NumberList from "@/app/components/NumberList";
 import FilterForm from "@/app/components/FilterForm";
 import useStore from "@/app/store/useStore";
 import "./index.css";
+import ChooseNumbers from "@/app/components/chooseNumbers";
 
 // 定义参数接口
 interface Params {
@@ -41,6 +42,9 @@ const SsqNumberGenerator = () => {
     blueOddEven: -1,
     blueBigSmall: -1,
   });
+
+  // 定义是否打开弹窗的状态
+  const [isOpen, setIsOpen] = useState(false);
 
   // 定义红球和蓝球的数字数组
 
@@ -240,6 +244,7 @@ const SsqNumberGenerator = () => {
     <div className="main-random">
       <NumberList numbers={numbers} setNumbers={setNumbers} />
       <GenerateButtonGroup
+        setIsOpen={setIsOpen}
         generateNumbers={generateNumbers}
         setShowMachine={setShowMachine}
         showMachine={showMachine}
@@ -248,6 +253,12 @@ const SsqNumberGenerator = () => {
         setParams={setParams}
       />
       {showMachine && <FilterForm params={params} setParams={setParams} />}
+      <ChooseNumbers
+        numbers={numbers}
+        setNumbers={setNumbers}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
     </div>
   );
 };

@@ -20,6 +20,7 @@ interface SearchParams {
 }
 
 interface DataItem {
+  winningNumbers: (number | number[])[];
   code: number;
   date: string;
   red: number[];
@@ -35,6 +36,12 @@ export default function Home() {
       .then((response) => response.json())
       .then((res: { result: DataItem[] }) => {
         let dataArr = res.result;
+        // 将red和blue字段转换为红球和蓝球的数组
+        dataArr.forEach((item) => {
+          let winningNumbers = [];
+          winningNumbers.push(item.red, item.blue);
+          item.winningNumbers = winningNumbers;
+        });
         if (searchParams.startDate && searchParams.endDate) {
           dataArr = dataArr.filter((item) => {
             const date = new Date(item.date);

@@ -2,16 +2,24 @@ import React, { useEffect } from "react";
 import RedBall from "@/app/components/RedBall";
 import BlueBall from "@/app/components/BlueBall";
 import { Row, Button } from "antd";
+import { nanoid } from "nanoid";
 import "./numberlist.css";
-const NumberList = ({ numbers, setNumbers }) => {
+
+interface NumberListProps {
+  numbers?: string[];
+  setNumbers?: (newNumbers: string[]) => void;
+}
+
+const NumberList = ({ numbers, setNumbers }: NumberListProps) => {
   const clearNumbers = () => {
-    setNumbers([]);
+    setNumbers?.([]);
   };
 
-  const deleteNumber = (index) => {
+  const deleteNumber = (index: number) => {
+    // @ts-ignore
     const newNumbers = numbers.filter((_, i) => i !== index);
     // 保持原数组的排序不变
-    setNumbers(newNumbers);
+    setNumbers?.(newNumbers);
   };
 
   return (
@@ -26,11 +34,12 @@ const NumberList = ({ numbers, setNumbers }) => {
         </Button>
       </Row>
       <ul className="select-number-list">
+        {/* @ts-ignore */}
         {numbers.map((num, index) => {
           const redNumbers = num.split(" + ")[0];
           const blueNumber = num.split(" + ")[1];
           return (
-            <li key={num}>
+            <li key={nanoid()}>
               <RedBall numbers={redNumbers} editable={true} />
               <BlueBall numbers={blueNumber} editable={true} />
               <Button onClick={() => deleteNumber(index)}>删除</Button>

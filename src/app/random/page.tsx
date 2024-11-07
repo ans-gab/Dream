@@ -93,87 +93,76 @@ const SsqNumberGenerator = (totalSum: number) => {
     redKill1: string,
     redKill2: string,
   ) {
-    const maxAttempts = 1000; // 最大尝试次数
-    let selectedNumbers: number[] = [];
     const redDefiniteNumbers = [redDefinite1, redDefinite2].filter(Boolean);
     const uniqueDefiniteNumbers = [...new Set(redDefiniteNumbers)];
     const redKillNumbers = [redKill1, redKill2].filter(Boolean).map(Number);
 
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      selectedNumbers = getRandomUniqueNumbers(
-        Array.from({ length: 33 }, (_, i) => i + 1),
-        6,
-      ); // 随机选择6个数字
-      let oddCount = selectedNumbers.filter((num) => num % 2 !== 0).length; // 奇数个数
-      let smallCount = selectedNumbers.filter((num) => num <= 16).length; // 小数个数
-      let totalSum = selectedNumbers.reduce((acc, num) => acc + num, 0); // 和
+    // 将数字按照大小和奇偶分类
+    const smallOddNumbers = Array.from({ length: 8 }, (_, i) => i * 2 + 1);
+    const smallEvenNumbers = Array.from({ length: 8 }, (_, i) => (i + 1) * 2);
+    const bigOddNumbers = Array.from({ length: 8 }, (_, i) => i * 2 + 17);
+    const bigEvenNumbers = Array.from({ length: 9 }, (_, i) => (i + 9) * 2);
 
-      // 检查是否包含定胆
-      const hasDefiniteNumbers = uniqueDefiniteNumbers.every((num) =>
-        // @ts-ignore
-        selectedNumbers.includes(num),
-      );
-      // 检查是否包含杀号
-      const hasKillingNumbers = redKillNumbers.every(
-        (num) => !selectedNumbers.includes(num),
-      );
-      // 检查是否符合奇偶比
-      const checkOddEvenRatio = checkOddEvenCondition(oddCount);
-      // 检查是否符合大小比
-      const checkSizeRatio = checkSizeCondition(smallCount);
-      // 检查是否符合和值范围
-      const checkSum = checkSumRange(totalSum);
-      // 检查是否符合连号
-      const hasConsecutiveNumbers =
-        isConsecutive === 1
-          ? checkConsecutive(selectedNumbers)
-          : isConsecutive === 2
-            ? !checkConsecutive(selectedNumbers)
-            : true;
-      if (
-        hasDefiniteNumbers &&
-        hasKillingNumbers &&
-        checkOddEvenRatio &&
-        checkSizeRatio &&
-        checkSum &&
-        hasConsecutiveNumbers
-      ) {
-        return selectedNumbers.sort((a, b) => a - b); // 返回排序后的号码
+    const generateValidNumbers = () => {
+      let numbers: number[] = [];
+      const targetOddCount = oddEvenRatio !== "all" ? Number(oddEvenRatio) : -1;
+      const targetSmallCount = sizeRatio !== "all" ? Number(sizeRatio) : -1;
+
+      if (targetOddCount !== -1 && targetSmallCount !== -1) {
+        // 计算每种类型需要的数量
+        const smallOddCount = Math.min(targetOddCount, targetSmallCount);
+        const smallEvenCount = targetSmallCount - smallOddCount;
+        const bigOddCount = targetOddCount - smallOddCount;
+        const bigEvenCount = 6 - smallOddCount - smallEvenCount - bigOddCount;
+
+        // 从各个类别中选择对应数量的数字
+        numbers = [
+          ...getRandomUniqueNumbers(smallOddNumbers, smallOddCount),
+          ...getRandomUniqueNumbers(smallEvenNumbers, smallEvenCount),
+          ...getRandomUniqueNumbers(bigOddNumbers, bigOddCount),
+          ...getRandomUniqueNumbers(bigEvenNumbers, bigEvenCount),
+        ];
+      } else {
+        numbers = getRandomUniqueNumbers(
+          Array.from({ length: 33 }, (_, i) => i + 1),
+          6,
+        );
+      }
+
+      // 检查和值范围
+      const sum = numbers.reduce((acc, num) => acc + num, 0);
+      if (sum < sumMin || sum > sumMax) return null;
+
+      // 检查定胆和杀号
+      if (!uniqueDefiniteNumbers.every((num) => numbers.includes(Number(num))))
+        return null;
+      if (redKillNumbers.some((num) => numbers.includes(num))) return null;
+
+      // 检查连号要求
+      const hasConsecutive = checkConsecutive(numbers);
+      if (isConsecutive === 1 && !hasConsecutive) return null;
+      if (isConsecutive === 2 && hasConsecutive) return null;
+
+      return numbers;
+    };
+
+    for (let attempt = 0; attempt < 1000; attempt++) {
+      const result = generateValidNumbers();
+      if (result) {
+        return result.sort((a, b) => a - b);
       }
     }
+
     notification.success({
       message: "生成失败",
       description: "无法生成符合条件的号码。",
-    }); // 超过最大尝试次数返回空数组
+    });
   }
 
   // 检查是否有连续数字
   function checkConsecutive(numbers: number[]): boolean {
     const sortedNumbers = numbers.sort((a, b) => a - b);
     return sortedNumbers.some((num, i) => num === sortedNumbers[i - 1] + 1); // 使用some方法简化检查逻辑
-  }
-
-  // 检查是否符合大小比
-  function checkSizeCondition(count: string | number) {
-    if (params.redBigSmall !== "all") {
-      return Number(count) === Number(params.redBigSmall);
-    } else {
-      return true;
-    }
-  }
-
-  // 检查是否符合奇偶比
-  function checkOddEvenCondition(count: string | number) {
-    if (params.redOddEven !== "all") {
-      return Number(count) === Number(params.redOddEven);
-    } else {
-      return true;
-    }
-  }
-
-  // 检查是否符合和值范围
-  function checkSumRange(totalSum: number) {
-    return totalSum >= params.redSumMin && totalSum <= params.redSumMax;
   }
 
   // 随机选择不重复的数字

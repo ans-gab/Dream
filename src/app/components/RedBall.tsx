@@ -10,22 +10,24 @@ interface RedBallProps {
   numbers?: string;
   editable?: boolean;
   isChoose?: boolean;
+  isOpen?: boolean | undefined;
 }
 
-const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
+const RedBall = ({ numbers, editable, isChoose, isOpen }: RedBallProps) => {
   const { data } = useStore();
-  // @ts-ignore
-  const [numberList, setNumberList] = useState(numbers.split(","));
+  const [numberList, setNumberList] = useState(numbers?.split(","));
   const [editIndex, setEditIndex] = useState(-1);
   // 定义是否被选中
   const [selectStates, setSelectStates] = useState<string[]>(
-    Array(numberList.length).fill("circle red-ball"),
+    Array(numberList?.length).fill("circle red-ball"),
   );
-  const { chooseNumber, setChooseNumbersNumber } = useStore();
-  // 初始加载时，默认都没有选中
+  const { chooseRedNumber, setChooseRedNumber } = useStore();
+  // 当弹窗打开时，初始化号码球的选中状态
   useEffect(() => {
-    setSelectStates(Array(numberList.length).fill("circle red-ball"));
-  }, [numbers]);
+    if (chooseRedNumber.length === 0) {
+      setSelectStates(Array(numberList?.length).fill("circle red-ball"));
+    }
+  }, [chooseRedNumber]);
 
   // 定义选中的号码、
   function getCount(num: any) {
@@ -46,8 +48,9 @@ const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
   const handleInputChange = (index: string | number, value: any) => {
     const paddedValue = String(value).padStart(2, "0");
 
-    if (numberList.includes(paddedValue)) {
+    if (numberList?.includes(paddedValue)) {
     } else {
+      // @ts-ignore
       const updatedList = [...numberList];
       // @ts-ignore
       updatedList[index] = paddedValue;
@@ -55,7 +58,7 @@ const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
     }
   };
 
-  const handleClick = (item: string, index: React.SetStateAction<number>) => {
+  const handleClick = (item: string, index: number) => {
     if (editable) {
       setEditIndex(index);
     }
@@ -63,25 +66,25 @@ const RedBall = ({ numbers, editable, isChoose }: RedBallProps) => {
     if (isChoose) {
       const updatedSelectStates = [...selectStates];
       if (updatedSelectStates[index] === "circle red-ball") {
-        if (chooseNumber.length < 6) {
+        if (chooseRedNumber.length < 6) {
           updatedSelectStates[index] = "circle red-ball choose";
-          let newChooseNumber = [...chooseNumber, item];
-          setChooseNumbersNumber(newChooseNumber);
+          let newChooseNumber = [...chooseRedNumber, item];
+          setChooseRedNumber(newChooseNumber);
         } else {
           // Optionally, you can alert the user or handle the excess item case here
           console.log("Cannot select more than 6 balls.");
         }
       } else {
         updatedSelectStates[index] = "circle red-ball";
-        let newChooseNumber = chooseNumber.filter((num) => num !== item);
-        setChooseNumbersNumber(newChooseNumber);
+        let newChooseNumber = chooseRedNumber.filter((num) => num !== item);
+        setChooseRedNumber(newChooseNumber);
       }
       setSelectStates(updatedSelectStates);
     }
   };
 
   const handleBlur = () => {
-    numberList.sort(
+    numberList?.sort(
       (a: string, b: string) => parseInt(a, 10) - parseInt(b, 10),
     );
     setEditIndex(-1);

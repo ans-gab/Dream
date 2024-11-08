@@ -7,21 +7,17 @@ import useStore from "@/app/store/useStore";
 interface ChooseNumbersProps {
   isOpen?: boolean;
   setIsOpen?: (value: ((prevState: boolean) => boolean) | boolean) => void;
-  numbers?: string[];
-  setNumbers?: (newNumbers: string[]) => void;
 }
 
-const ChooseNumbers = ({
-  isOpen,
-  setIsOpen,
-  numbers,
-  setNumbers,
-}: ChooseNumbersProps) => {
-  const { chooseNumber, setChooseNumbersNumber } = useStore();
-  useEffect(() => {
-    // 当值变更时重新渲染页面，选中的号码更新
-    console.log("新的选择数更新:", chooseNumber);
-  }, [chooseNumber]);
+const ChooseNumbers = ({ isOpen, setIsOpen }: ChooseNumbersProps) => {
+  const {
+    chooseRedNumber,
+    setChooseRedNumber,
+    chooseBlueNumber,
+    setChooseBlueNumber,
+    numbers,
+    setNumbers,
+  } = useStore();
   // 定义1到33的红球以逗号分隔的字符串
   const redNumbers =
     "01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33";
@@ -29,15 +25,18 @@ const ChooseNumbers = ({
   const blueNumbers = "01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16";
 
   const handleOk = () => {
-    setNumbers?.([
-      `${chooseNumber.slice(0, 6).join(",")} + ${chooseNumber[6]}`,
-    ]);
-    setChooseNumbersNumber([]);
+    numbers?.push(
+      `${chooseRedNumber.slice(0, 6).join(",")} + ${chooseBlueNumber[0]}`,
+    );
+    setNumbers?.(numbers);
+    setChooseRedNumber([]);
+    setChooseBlueNumber([]);
     setIsOpen?.(false);
   };
 
   const handleCancel = () => {
-    setChooseNumbersNumber([]);
+    setChooseRedNumber([]);
+    setChooseBlueNumber([]);
     setIsOpen?.(false);
   };
 
@@ -50,13 +49,26 @@ const ChooseNumbers = ({
     >
       <div className="choose-mian">
         <div className="choose-red">
-          <RedBall numbers={redNumbers} editable={false} isChoose={true} />
+          <RedBall
+            isOpen={isOpen}
+            numbers={redNumbers}
+            editable={false}
+            isChoose={true}
+          />
         </div>
         <div className="choose-blue">
-          <BlueBall numbers={blueNumbers} editable={false} isChoose={true} />
+          <BlueBall
+            isOpen={isOpen}
+            numbers={blueNumbers}
+            editable={false}
+            isChoose={true}
+          />
         </div>
       </div>
-      <div>选中的号码: {chooseNumber.join(",")}</div>
+      <div>
+        选中的号码:{" "}
+        {chooseRedNumber.join(",") + "+" + chooseBlueNumber?.join(",")}
+      </div>
     </Modal>
   );
 };

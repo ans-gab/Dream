@@ -22,7 +22,6 @@ const NumberList = ({ numbers, setNumbers }: NumberListProps) => {
     setNumbers?.(newNumbers);
   };
 
-  console.log(numbers, "list");
   return (
     <div style={{ marginTop: 16 }}>
       <Row

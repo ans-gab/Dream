@@ -9,9 +9,10 @@ interface BlueBallProps {
   numbers?: string;
   editable?: boolean;
   isChoose?: boolean;
+  isOpen?: boolean | undefined;
 }
 
-const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
+const BlueBall = ({ numbers, editable, isChoose, isOpen }: BlueBallProps) => {
   const { data } = useStore();
   // @ts-ignore
   const initialNumbers = numbers.split(",");
@@ -22,12 +23,12 @@ const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
   const [selectStates, setSelectStates] = useState<string[]>(
     Array(numberList.length).fill("circle blue-ball"),
   );
-  const { chooseNumber, setChooseNumbersNumber } = useStore();
+  const { chooseBlueNumber, setChooseBlueNumber } = useStore();
 
   // 初始加载时，默认都没有选中
   useEffect(() => {
     setSelectStates(Array(numberList.length).fill("circle blue-ball"));
-  }, [initialNumbers]);
+  }, [isOpen]);
 
   // 根据传入的参数，统计当前红球号码出现的次数;
   function getCount(num: any) {
@@ -55,7 +56,7 @@ const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
     setNumberList(updatedList);
   };
 
-  const handleClick = (item: string, index: React.SetStateAction<number>) => {
+  const handleClick = (item: string, index: number) => {
     if (editable) {
       setEditIndex(index);
     }
@@ -64,12 +65,12 @@ const BlueBall = ({ numbers, editable, isChoose }: BlueBallProps) => {
       // @ts-ignore
       if (updatedSelectStates[index] === "circle blue-ball") {
         updatedSelectStates[index] = "circle blue-ball choose";
-        let newChooseNumber = [...chooseNumber, item];
-        setChooseNumbersNumber(newChooseNumber);
+        let newChooseNumber = [...chooseBlueNumber, item];
+        setChooseBlueNumber(newChooseNumber);
       } else {
         updatedSelectStates[index] = "circle blue-ball";
-        let newChooseNumber = chooseNumber.filter((num) => num !== item);
-        setChooseNumbersNumber(newChooseNumber);
+        let newChooseNumber = chooseBlueNumber.filter((num) => num !== item);
+        setChooseBlueNumber(newChooseNumber);
       }
       setSelectStates(updatedSelectStates);
     }

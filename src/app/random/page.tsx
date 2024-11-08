@@ -253,7 +253,7 @@ const SsqNumberGenerator = () => {
         setParams={setParams}
       />
       {showMachine && <FilterForm params={params} setParams={setParams} />}
-      <ChooseNumbers numbers={numbers} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <ChooseNumbers isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
   );
 };

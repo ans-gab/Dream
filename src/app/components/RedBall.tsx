@@ -1,11 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import useStore from "@/app/store/useStore"; // 引入 Zustand store
-import { InputNumber, Tooltip } from "antd";
+import { InputNumber, Tooltip, notification } from "antd";
 import "./ball.css";
 
 // @ts-ignore
-
 interface RedBallProps {
   numbers?: string;
   editable?: boolean;
@@ -47,7 +46,6 @@ const RedBall = ({ numbers, editable, isChoose, isOpen }: RedBallProps) => {
 
   const handleInputChange = (index: string | number, value: any) => {
     const paddedValue = String(value).padStart(2, "0");
-
     if (numberList?.includes(paddedValue)) {
     } else {
       // @ts-ignore
@@ -66,13 +64,17 @@ const RedBall = ({ numbers, editable, isChoose, isOpen }: RedBallProps) => {
     if (isChoose) {
       const updatedSelectStates = [...selectStates];
       if (updatedSelectStates[index] === "circle red-ball") {
+        console.log(chooseRedNumber);
         if (chooseRedNumber.length < 6) {
           updatedSelectStates[index] = "circle red-ball choose";
           let newChooseNumber = [...chooseRedNumber, item];
           setChooseRedNumber(newChooseNumber);
         } else {
           // Optionally, you can alert the user or handle the excess item case here
-          console.log("Cannot select more than 6 balls.");
+          notification.warning({
+            message: "数字超量",
+            description: "已选择的红球不能超过6个",
+          });
         }
       } else {
         updatedSelectStates[index] = "circle red-ball";

@@ -23,7 +23,7 @@ const useStore = create<StoreState>((set) => ({
   setData: (newData) => set({ data: newData }),
   setCurrentPage: (page) => set({ currentPage: page }),
   setChooseRedNumber: (newNumbers) => set({ chooseRedNumber: newNumbers }),
-  setChooseBlueNumber: (newNumbers) => set({ chooseRedNumber: newNumbers }),
+  setChooseBlueNumber: (newNumbers) => set({ chooseBlueNumber: newNumbers }),
 }));
 
 export default useStore;

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Modal, Button, InputNumber } from "antd";
+import { Modal, notification } from "antd";
 import RedBall from "@/app/components/RedBall";
 import BlueBall from "@/app/components/BlueBall";
 import useStore from "@/app/store/useStore";
@@ -25,12 +25,21 @@ const ChooseNumbers = ({ isOpen, setIsOpen }: ChooseNumbersProps) => {
   const blueNumbers = "01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16";
 
   const handleOk = () => {
-    numbers?.push(
-      `${chooseRedNumber.slice(0, 6).join(",")} + ${chooseBlueNumber[0]}`,
-    );
-    setNumbers?.(numbers);
-    setChooseRedNumber([]);
-    setChooseBlueNumber([]);
+    // 判断选择的数字数量是否满足chooseRedNumber=6  chooseBlueNumber=1
+    if (chooseRedNumber.length === 6 || chooseBlueNumber.length === 1) {
+      numbers?.push(
+        `${chooseRedNumber.slice(0, 6).join(",")} + ${chooseBlueNumber[0]}`,
+      );
+      setNumbers?.(numbers);
+      setChooseRedNumber([]);
+      setChooseBlueNumber([]);
+    } else {
+      notification.warning({
+        message: "数量不够",
+        description: "已选择的号码数量不够，请继续添加",
+      });
+      return;
+    }
     setIsOpen?.(false);
   };
 

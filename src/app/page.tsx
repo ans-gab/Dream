@@ -32,7 +32,7 @@ export default function Home() {
   const [searchParams, setSearchParams] = useState<SearchParams>({});
 
   const getData = () => {
-    fetch("data.json")
+    fetch("/data.json")
       .then((response) => response.json())
       .then((res: { result: DataItem[] }) => {
         let dataArr = res.result;

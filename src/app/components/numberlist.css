@@ -2,8 +2,8 @@ ul.select-number-list {
   height: 295px;
   display: flex;
   flex-direction: column; /* 设置为垂直方向 */
-  align-items: start; /* 水平居中对齐 */
-  justify-content: start; /* 垂直居中对齐 */
+  align-items: flex-start; /* 水平居中对齐 */
+  justify-content: flex-start; /* 垂直居中对齐 */
   /* 使容器充满视口高度 */
   padding: 10px 0;
   overflow: auto;

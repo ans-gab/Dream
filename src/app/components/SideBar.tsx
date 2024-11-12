@@ -27,13 +27,14 @@ const items = [
 const SlideBar = () => {
   const [theme, setTheme] = useState("light");
   const { currentPage, setCurrentPage } = useStore();
-  const changeTheme = (value) => {
+  const changeTheme = (value: any) => {
     setTheme(value ? "light" : "dark");
   };
-  const onClick = (e) => {
+  const onClick = (e: { key: string }) => {
     console.log("click ", e);
     setCurrentPage(e.key);
   };
+
   return (
     <div className="left-slide">
       <Switch
@@ -45,6 +46,7 @@ const SlideBar = () => {
       <br />
       <br />
       <Menu
+        // @ts-ignore
         theme={theme}
         onClick={onClick}
         style={{

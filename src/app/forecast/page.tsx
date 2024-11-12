@@ -9,22 +9,16 @@ import "./index.css";
 import useStore from "@/app/store/useStore";
 
 const { RangePicker } = DatePicker;
-
 interface SearchParams {
   startDate?: string | null;
   endDate?: string | null;
 }
-
 interface ForeCastProps {
   getData?: () => void;
   searchParams?: SearchParams;
   setSearchParams?: (
     value: ((prevState: SearchParams) => SearchParams) | SearchParams,
   ) => void;
-}
-
-interface ForeCastProps {
-  getData?: () => void;
 }
 
 const ForeCast = ({

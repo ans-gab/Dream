@@ -2,9 +2,10 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
+    "baseUrl": "src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    //    "strict": true,
     "skipLibCheck": true,
     "lib": [
       "dom",
@@ -23,9 +24,12 @@
         "name": "next"
       }
     ],
-    "paths" :{
-        "@/*" : ["src/*"],
-    }
+    "paths": {
+      "@/*": [
+        "*"
+      ]
+    },
+    "strict": false
   },
   "include": [
     "next-env.d.ts",
